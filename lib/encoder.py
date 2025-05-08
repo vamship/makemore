@@ -1,7 +1,8 @@
 class Encoder:
 
     def __init__(self, vocabulary):
-        assert isinstance(vocabulary, str), 'Vocabulary must be a string'
+        assert isinstance(vocabulary,
+                          (str, list)), 'Vocabulary must be an array or string'
         self._char_lookup = list(vocabulary)
         self._char_lookup.insert(0, '.')
         self._char_map = {}
@@ -18,4 +19,3 @@ class Encoder:
     def get_char(self, index):
         assert index >= 0, 'Character index must be greater than or equal to 0'
         return self._char_map[index]
-
