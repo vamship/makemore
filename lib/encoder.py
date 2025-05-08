@@ -17,4 +17,4 @@ class Encoder:
 
     def get_char(self, index):
         assert index >= 0, 'Character index must be greater than or equal to 0'
-        return self._char_map[index]
+        return self._char_lookup[index]
