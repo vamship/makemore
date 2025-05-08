@@ -7,10 +7,9 @@ class WordList:
         assert isinstance(file_name, str), 'File name must be a string'
         self._file_name = file_name
         self.__word_list = None
-        self._vocabulary = None
+        self.__vocab_list = None
 
-    @property
-    def _words(self):
+    def _ensure_data(self):
         if self.__word_list is None:
             vocab = set()
             self.__word_list = []
@@ -19,17 +18,30 @@ class WordList:
                     self.__word_list.append(Word(word_text))
                     for char in word_text:
                         vocab.add(char)
-            self._vocabulary = list(vocab)
-            self._vocabulary.sort()
+            self.__vocab_list = list(vocab)
+            self.__vocab_list.sort()
+            self.__vocab_list.insert(0, '.')
 
+    @property
+    def _words(self):
+        self._ensure_data()
         return self.__word_list
 
+    @property
+    def _vocabulary(self):
+        self._ensure_data()
+        return self.__vocab_list
+
     def __repr__(self):
-        return f'WordList({len(self.names)})'
+        return f'WordList(count={self.count}, vocab={self.vocabulary_size})'
 
     def __getitem__(self, index):
-        assert index >= 0, 'Word index must be greater than or equal to zero'
-        return self._words[index]
+        if isinstance(index, slice):
+            start, stop, step = index.start, index.stop, index.step
+            return self._words[start:stop:step]
+        else:
+            assert index >= 0, 'Word index must be greater than or equal to zero'
+            return self._words[index]
 
     @property
     def count(self):
@@ -38,3 +50,7 @@ class WordList:
     @property
     def vocabulary(self):
         return self._vocabulary
+
+    @property
+    def vocabulary_size(self):
+        return len(self._vocabulary)
