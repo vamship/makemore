@@ -4,7 +4,6 @@ class Encoder:
         assert isinstance(vocabulary,
                           (str, list)), 'Vocabulary must be an array or string'
         self._char_lookup = list(vocabulary)
-        self._char_lookup.insert(0, '.')
         self._char_map = {}
         for index, char in enumerate(self._char_lookup):
             self._char_map[char] = index
