@@ -4,7 +4,7 @@ from .word import Word
 class WordList:
 
     def __init__(self, file_name):
-        assert isinstance(file_name, str), 'File name must be a string'
+        assert isinstance(file_name, str), 'Invalid file_name (arg #1)'
         self._file_name = file_name
         self.__word_list = None
         self.__vocab_list = None
@@ -40,7 +40,7 @@ class WordList:
             start, stop, step = index.start, index.stop, index.step
             return self._words[start:stop:step]
         else:
-            assert index >= 0, 'Word index must be greater than or equal to zero'
+            assert index >= 0, 'Invalid index (arg #1)'
             return self._words[index]
 
     @property

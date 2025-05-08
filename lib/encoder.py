@@ -2,7 +2,7 @@ class Encoder:
 
     def __init__(self, vocabulary):
         assert isinstance(vocabulary,
-                          (str, list)), 'Vocabulary must be an array or string'
+                          (str, list)), 'Invalid vocabulary (arg #1)'
         self._char_lookup = list(vocabulary)
         self._char_map = {}
         for index, char in enumerate(self._char_lookup):
@@ -12,9 +12,9 @@ class Encoder:
         return f'Encoder({len(self._char_lookup)})'
 
     def get_index(self, char):
-        assert isinstance(char, str), 'Character input must be a string'
+        assert isinstance(char, str), 'Invalid character (arg #1)'
         return self._char_map.get(char, None)
 
     def get_char(self, index):
-        assert index >= 0, 'Character index must be greater than or equal to 0'
+        assert index >= 0, 'Invalid index (arg #1)'
         return self._char_lookup[index]

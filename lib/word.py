@@ -1,7 +1,7 @@
 class Word:
 
     def __init__(self, text):
-        assert isinstance(text, str), 'Word must be a string'
+        assert isinstance(text, str), 'Invalid text (arg #1)'
         self._text = text
         self._pairs = None
 
