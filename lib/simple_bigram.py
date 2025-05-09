@@ -23,7 +23,7 @@ class SimpleBigram:
                 self._bigram_counts[row, col] += 1
 
         sums = self._bigram_counts.sum(1, keepdim=True)
-        self._bigram_probs = self._bigram_counts/sums
+        self._bigram_probs = self._bigram_counts / sums
 
     def _get_pair_indices(self, pair):
         row, col, *_ = [self._encoder.get_index(char) for char in pair]
@@ -42,6 +42,12 @@ class SimpleBigram:
                 probs.append(data[row_index, col_index].item())
             print(' '.join(labels))
             print(' '.join([f'{prob:^8.4f}' for prob in probs]))
+
+    def __call__(self, index, generator=None):
+        return torch.multinomial(self._bigram_probs[index],
+                                       1,
+                                       replacement=True,
+                                       generator=generator).item()
 
     def get_char_pair_count(self, pair):
         row, col = self._get_pair_indices(pair)

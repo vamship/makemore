@@ -4,9 +4,19 @@ def run_default(args):
 
     words = WordList('data/names.txt')
     encoder = Encoder(words.vocabulary)
-    print(words)
     model = SimpleBigram(words, encoder)
-    model.show_probs(encoder)
+
+    generator = torch.Generator().manual_seed(1337)
+    for _ in range(5):
+        index = encoder.get_index('.')
+        chars = []
+        while True:
+            index = model(index, generator)
+            if index == 0:
+                break
+            chars.append(encoder.get_char(index))
+
+        print(''.join(chars))
 
 
 if __name__ == '__main__':
