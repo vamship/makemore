@@ -1,5 +1,6 @@
-def run_default(args):
+def run_simple_bigram(args):
     from lib import WordList, Encoder, SimpleBigram
+    from lib import generate_words, show_stats, calculate_loss
     import torch
 
     words = WordList('data/names.txt')
@@ -7,16 +8,18 @@ def run_default(args):
     model = SimpleBigram(words, encoder)
 
     generator = torch.Generator().manual_seed(1337)
-    for _ in range(5):
-        index = encoder.get_index('.')
-        chars = []
-        while True:
-            index = model(index, generator)
-            if index == 0:
-                break
-            chars.append(encoder.get_char(index))
 
-        print(''.join(chars))
+    for word in generate_words(model, encoder, 5, generator):
+        print(word)
+    print('---')
+    show_stats(model, words[:3])
+    print('---')
+    print(f'{calculate_loss(model, words[:3])=:.4f}')
+    print('---')
+
+
+def run_neuron_bigram(args):
+    pass
 
 
 if __name__ == '__main__':
@@ -30,7 +33,8 @@ if __name__ == '__main__':
                         '%(message)s')
 
     command_map = {
-        'default': (run_default, 'Runs the default command'),
+        'simple': (run_simple_bigram, 'Evaluates the simple bigram model'),
+        'neuron': (run_neuron_bigram, 'Evaluates the neuron bigram model'),
     }
     args = sys.argv
     command_name = args[1] if len(args) > 1 else ''
