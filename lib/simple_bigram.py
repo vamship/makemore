@@ -49,13 +49,17 @@ class SimpleBigram:
                                        replacement=True,
                                        generator=generator).item()
 
-    def get_char_pair_count(self, pair):
+    def get_count(self, pair):
         row, col = self._get_pair_indices(pair)
         return self._bigram_counts[row, col].item()
 
-    def get_char_pair_prob(self, pair):
+    def get_probability(self, pair):
         row, col = self._get_pair_indices(pair)
         return self._bigram_probs[row, col].item()
+
+    def get_log_likelihood(self, pair):
+        row, col = self._get_pair_indices(pair)
+        return -torch.log(self._bigram_probs[row, col])
 
     def show_counts(self, encoder):
         SimpleBigram._show_data(self._bigram_counts, encoder)
