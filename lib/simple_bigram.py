@@ -1,6 +1,7 @@
 import torch
 from .word_list import WordList
 from .encoder import Encoder
+from .utils import global_generator
 
 
 class SimpleBigram:
@@ -44,6 +45,8 @@ class SimpleBigram:
             print(' '.join([f'{prob:^8.4f}' for prob in probs]))
 
     def __call__(self, index, generator=None):
+        if generator is None:
+            generator = global_generator
         return torch.multinomial(self._bigram_probs[index],
                                        1,
                                        replacement=True,
