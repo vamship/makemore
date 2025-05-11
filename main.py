@@ -19,7 +19,19 @@ def run_simple_bigram(args):
 
 
 def run_neuron_bigram(args):
-    pass
+    from lib import WordList, Encoder, NeuronBigram
+    from lib import generate_words, show_stats, calculate_loss, init_random
+    import torch
+
+    init_random(1337)
+
+    words = WordList('data/names.txt')
+    encoder = Encoder(words.vocabulary)
+    model = NeuronBigram(words.vocabulary_size)
+    xs = torch.stack([encoder.get_embedding(char) for char in words[0].text])
+    # print(encoder.get_embedding('.'))
+    print(xs)
+    print(model(encoder.get_embedding('.')))
 
 
 if __name__ == '__main__':
