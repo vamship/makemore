@@ -23,15 +23,33 @@ def run_neuron_bigram(args):
     from lib import generate_words, show_stats, calculate_loss, init_random
     import torch
 
-    init_random(1337)
+    init_random(2147483647)
 
     words = WordList('data/names.txt')
     encoder = Encoder(words.vocabulary)
     model = NeuronBigram(words.vocabulary_size)
-    xs = torch.stack([encoder.get_embedding(char) for char in words[0]])
-    # print(encoder.get_embedding('.'))
-    print(xs)
-    print(model(encoder.get_embedding('.')))
+
+    inputs = []
+    labels = []
+    for word in words[:3]:
+        for pair in word.get_pairs():
+            inputs.append(pair[0])
+            labels.append(pair[1])
+
+    print(inputs)
+    print(labels)
+
+    inputs = torch.stack([encoder.get_embedding(char) for char in inputs])
+    labels = torch.stack([encoder.get_embedding(char) for char in labels])
+    predictions = model(inputs)
+    for index in range(len(inputs)):
+        label_index = torch.argmax(labels[index])
+        x = encoder.get_char_from_embedding(inputs[index])
+        y = encoder.get_char_from_embedding(labels[index])
+
+        prob = predictions[index, label_index]
+        logprob = -torch.log(prob)
+        print(f'{x} -> {y} {prob=:.4f} {logprob=:.4f}')
 
 
 if __name__ == '__main__':
