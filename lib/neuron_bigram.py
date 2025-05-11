@@ -17,9 +17,8 @@ class NeuronBigram:
         if generator is None:
             generator = global_generator
 
-        logits = self._weights @ embeddings
+        logits = embeddings @ self._weights
         sum_index = len(logits.shape) - 1
-        print(sum_index)
         probs = torch.exp(logits)
         probs /= probs.sum(sum_index, keepdim=True)
         return probs
