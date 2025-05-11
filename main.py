@@ -28,7 +28,7 @@ def run_neuron_bigram(args):
     words = WordList('data/names.txt')
     encoder = Encoder(words.vocabulary)
     model = NeuronBigram(words.vocabulary_size)
-    xs = torch.stack([encoder.get_embedding(char) for char in words[0].text])
+    xs = torch.stack([encoder.get_embedding(char) for char in words[0]])
     # print(encoder.get_embedding('.'))
     print(xs)
     print(model(encoder.get_embedding('.')))

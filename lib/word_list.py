@@ -35,6 +35,9 @@ class WordList:
     def __repr__(self):
         return f'WordList(count={self.count}, vocab={self.vocabulary_size})'
 
+    def __len__(self):
+        return len(self._text)
+
     def __getitem__(self, index):
         if isinstance(index, slice):
             start, stop, step = index.start, index.stop, index.step
