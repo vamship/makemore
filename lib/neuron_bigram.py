@@ -20,5 +20,11 @@ class NeuronBigram:
         logits = embeddings @ self._weights
         sum_index = len(logits.shape) - 1
         probs = torch.exp(logits)
-        probs /= probs.sum(sum_index, keepdim=True)
+        probs = probs/probs.sum(sum_index, keepdim=True)
         return probs
+
+    def reset_grad(self):
+        self._weights.grad = None
+
+    def descend(self, delta):
+        self._weights.data += -delta * self._weights.grad

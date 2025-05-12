@@ -20,7 +20,7 @@ def run_simple_bigram(args):
 
 def run_neuron_bigram(args):
     from lib import WordList, Encoder, NeuronBigram
-    from lib import generate_words, show_stats, calculate_loss, init_random
+    from lib import init_random
     import torch
 
     init_random(2147483647)
@@ -29,27 +29,52 @@ def run_neuron_bigram(args):
     encoder = Encoder(words.vocabulary)
     model = NeuronBigram(words.vocabulary_size)
 
-    inputs = []
-    labels = []
-    for word in words[:3]:
-        for pair in word.get_pairs():
-            inputs.append(pair[0])
-            labels.append(pair[1])
+    def prepare_data(count=1):
+        input_chars = []
+        label_chars = []
+        for word in words[:count]:
+            for pair in word.get_pairs():
+                input_chars.append(pair[0])
+                label_chars.append(pair[1])
 
-    print(inputs)
-    print(labels)
+        inputs = torch.stack(
+            [encoder.get_embedding(char) for char in input_chars])
+        labels = torch.stack(
+            [encoder.get_embedding(char) for char in label_chars])
+        return inputs, labels
 
-    inputs = torch.stack([encoder.get_embedding(char) for char in inputs])
-    labels = torch.stack([encoder.get_embedding(char) for char in labels])
+    def calculate_loss(labels, predictions):
+        probs = predictions[torch.arange(predictions.shape[0]),
+                            labels.argmax(1)]
+        loss = -probs.log().mean()
+        return loss
+
+    def generate_words(model, encoder, count):
+        for index in range(count):
+            chars = []
+            index = encoder.get_index('.')
+            while True:
+                probs = model(encoder.get_embedding(index))
+                index = torch.multinomial(probs, 1).item()
+                if index == 0:
+                    break
+                chars.append(encoder.get_char(index))
+            print(''.join(chars))
+
+    inputs, labels = prepare_data(words.count)
     predictions = model(inputs)
-    for index in range(len(inputs)):
-        label_index = torch.argmax(labels[index])
-        x = encoder.get_char_from_embedding(inputs[index])
-        y = encoder.get_char_from_embedding(labels[index])
+    loss = calculate_loss(labels, predictions)
 
-        prob = predictions[index, label_index]
-        logprob = -torch.log(prob)
-        print(f'{x} -> {y} {prob=:.4f} {logprob=:.4f}')
+    for iteration in range(500):
+        predictions = model(inputs)
+        loss = calculate_loss(labels, predictions)
+        print(f'[{iteration:>4}] {loss=:.8f}')
+
+        model.reset_grad()
+        loss.backward()
+        model.descend(50)
+
+    generate_words(model, encoder, 20)
 
 
 if __name__ == '__main__':
