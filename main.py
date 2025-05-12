@@ -1,6 +1,6 @@
 def run_simple_bigram(args):
     from lib import WordList, Encoder, SimpleBigram
-    from lib import init_random
+    from lib import init_random, prepare_data
     import torch
 
     init_random(2147483647)
@@ -8,21 +8,6 @@ def run_simple_bigram(args):
     words = WordList('data/names.txt')
     encoder = Encoder(words.vocabulary)
     model = SimpleBigram(words, encoder)
-
-    def prepare_data(count=1):
-        input_chars = []
-        label_chars = []
-        for word in words[:count]:
-            for pair in word.get_pairs():
-                input_chars.append(pair[0])
-                label_chars.append(pair[1])
-
-        inputs = torch.tensor(
-            [encoder.get_index(char) for char in input_chars])
-        labels = torch.tensor(
-            [encoder.get_index(char) for char in label_chars])
-        return inputs, labels
-
     # def show_stats(model, words):
     #     for word in words:
     #         for pair in word.get_pairs():
@@ -31,7 +16,10 @@ def run_simple_bigram(args):
     #             likelihood = model.get_log_likelihood(pair)
     #             print(f'{pair}: {count=:>8}, {prob=:.4f}, {likelihood=:.4f}')
 
-    inputs, labels = prepare_data(words.count)
+    transform = lambda chars: torch.tensor(
+        [encoder.get_index(char) for char in chars])
+
+    inputs, labels = prepare_data(words[:], transform)
     predictions, loss = model(inputs, labels)
 
     print('---')
@@ -43,7 +31,7 @@ def run_simple_bigram(args):
 
 def run_neuron_bigram(args):
     from lib import WordList, Encoder, NeuronBigram
-    from lib import init_random, global_generator
+    from lib import init_random, prepare_data
     import torch
 
     init_random(2147483647)
@@ -52,21 +40,9 @@ def run_neuron_bigram(args):
     encoder = Encoder(words.vocabulary)
     neuron_model = NeuronBigram(words.vocabulary_size)
 
-    def prepare_data(count=1):
-        input_chars = []
-        label_chars = []
-        for word in words[:count]:
-            for pair in word.get_pairs():
-                input_chars.append(pair[0])
-                label_chars.append(pair[1])
-
-        inputs = torch.stack(
-            [encoder.get_embedding(char) for char in input_chars])
-        labels = torch.stack(
-            [encoder.get_embedding(char) for char in label_chars])
-        return inputs, labels
-
-    inputs, labels = prepare_data(words.count)
+    transform = lambda chars: torch.stack(
+        [encoder.get_embedding(char) for char in chars])
+    inputs, labels = prepare_data(words[:], transform)
 
     for iteration in range(500):
         predictions, loss = neuron_model(inputs, labels=labels)
@@ -77,11 +53,10 @@ def run_neuron_bigram(args):
         neuron_model.descend(50)
 
     print('---')
-    print(loss)
+    print(loss.item())
     print('---')
     for _ in range(5):
         print(neuron_model.generate_word(encoder))
-
 
 
 if __name__ == '__main__':
