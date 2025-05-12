@@ -16,18 +16,17 @@ class SimpleBigram:
         self._bigram_probs = torch.zeros(
             (word_list.vocabulary_size, word_list.vocabulary_size),
             dtype=torch.float)
-        self._encoder = encoder
 
         for word in word_list:
             for pair in word.get_pairs():
-                row, col = self._get_pair_indices(pair)
+                row, col = self._get_pair_indices(pair, encoder)
                 self._bigram_counts[row, col] += 1
 
         sums = self._bigram_counts.sum(1, keepdim=True)
         self._bigram_probs = self._bigram_counts / sums
 
-    def _get_pair_indices(self, pair):
-        row, col, *_ = [self._encoder.get_index(char) for char in pair]
+    def _get_pair_indices(self, pair, encoder):
+        row, col, *_ = [encoder.get_index(char) for char in pair]
         return row, col
 
     def _show_data(data, encoder):
@@ -78,16 +77,16 @@ class SimpleBigram:
             chars.append(encoder.get_char(index))
         return ''.join(chars)
 
-    def get_count(self, pair):
-        row, col = self._get_pair_indices(pair)
+    def get_count(self, pair, encoder):
+        row, col = self._get_pair_indices(pair, encoder)
         return self._bigram_counts[row, col].item()
 
-    def get_probability(self, pair):
-        row, col = self._get_pair_indices(pair)
+    def get_probability(self, pair, encoder):
+        row, col = self._get_pair_indices(pair, encoder)
         return self._bigram_probs[row, col].item()
 
-    def get_log_likelihood(self, pair):
-        row, col = self._get_pair_indices(pair)
+    def get_log_likelihood(self, pair, encoder):
+        row, col = self._get_pair_indices(pair, encoder)
         return -torch.log(self._bigram_probs[row, col])
 
     def show_counts(self, encoder):
