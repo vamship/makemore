@@ -44,13 +44,39 @@ class SimpleBigram:
             print(' '.join(labels))
             print(' '.join([f'{prob:^8.4f}' for prob in probs]))
 
-    def __call__(self, index, generator=None):
+    def __call__(self, inputs, labels=None, generator=None):
         if generator is None:
             generator = global_generator
-        return torch.multinomial(self._bigram_probs[index],
-                                       1,
-                                       replacement=True,
-                                       generator=generator).item()
+
+        if isinstance(inputs, (int, float)):
+            inputs = torch.tensor([inputs], dtype=torch.float)
+        elif isinstance(inputs, list):
+            inputs = torch.tensor(inputs, dtype=torch.float)
+        assert isinstance(inputs, torch.Tensor), 'Invalid inputs (arg #1)'
+
+        predictions = torch.multinomial(self._bigram_probs[inputs.int()],
+                                        1,
+                                        replacement=True,
+                                        generator=generator)
+        loss = None
+        if labels is not None:
+            loss = -torch.log(self._bigram_probs[inputs, labels]).mean().item()
+
+        return predictions, loss
+
+    def generate_word(self, encoder, generator=None):
+        if generator is None:
+            generator = global_generator
+
+        chars = []
+        index = encoder.get_index('.')
+        while True:
+            index, _ = self(index)
+            index = index.item()
+            if index == encoder.get_index('.'):
+                break
+            chars.append(encoder.get_char(index))
+        return ''.join(chars)
 
     def get_count(self, pair):
         row, col = self._get_pair_indices(pair)
