@@ -23,7 +23,7 @@ def run_simple_bigram(args):
     predictions, loss = model(inputs, labels)
 
     print('---')
-    print(loss)
+    print(loss.item())
     print('---')
     for _ in range(5):
         print(model.generate_word(encoder))
