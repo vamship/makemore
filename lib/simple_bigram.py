@@ -60,7 +60,7 @@ class SimpleBigram:
                                         generator=generator)
         loss = None
         if labels is not None:
-            loss = -torch.log(self._bigram_probs[inputs, labels]).mean().item()
+            loss = -torch.log(self._bigram_probs[inputs, labels]).mean()
 
         return predictions, loss
 
