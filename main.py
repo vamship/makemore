@@ -22,15 +22,15 @@ def run_simple_bigram(args):
     inputs, labels = prepare_data(words[:], transform)
     predictions, loss = model(inputs, labels)
 
-    print('---')
+    print('=== Simple model ===')
     print(loss.item())
-    print('---')
+    print('--- Words ---')
     for _ in range(5):
         print(model.generate_word(encoder))
 
 
 def run_neuron_bigram(args):
-    from lib import WordList, Encoder, NeuronBigram
+    from lib import WordList, Encoder, NeuronBigram, SimpleBigram
     from lib import init_random, prepare_data
     import torch
 
@@ -39,12 +39,13 @@ def run_neuron_bigram(args):
     words = WordList('data/names.txt')
     encoder = Encoder(words.vocabulary)
     neuron_model = NeuronBigram(words.vocabulary_size)
+    simple_model = SimpleBigram(words, encoder)
 
     transform = lambda chars: torch.stack(
         [encoder.get_embedding(char) for char in chars])
     inputs, labels = prepare_data(words[:], transform)
 
-    for iteration in range(500):
+    for iteration in range(50):
         predictions, loss = neuron_model(inputs, labels=labels)
         print(f'[{iteration:>4}] {loss=:.8f}')
 
@@ -52,11 +53,18 @@ def run_neuron_bigram(args):
         loss.backward()
         neuron_model.descend(50)
 
-    print('---')
-    print(loss.item())
-    print('---')
+    print('=== Neuron model ===')
+    print(f'loss={loss.item()}')
+    print('--- Words ---')
+    init_random(2147483647)
     for _ in range(5):
         print(neuron_model.generate_word(encoder))
+
+    print('=== Simple model ===')
+    print('--- Words ---')
+    init_random(2147483647)
+    for _ in range(5):
+        print(simple_model.generate_word(encoder))
 
 
 if __name__ == '__main__':
