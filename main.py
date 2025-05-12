@@ -1,26 +1,57 @@
 def run_simple_bigram(args):
     from lib import WordList, Encoder, SimpleBigram
-    from lib import generate_words, show_stats, calculate_loss
+    from lib import init_random
     import torch
+
+    init_random(2147483647)
 
     words = WordList('data/names.txt')
     encoder = Encoder(words.vocabulary)
     model = SimpleBigram(words, encoder)
 
-    generator = torch.Generator().manual_seed(1337)
+    def generate_words(model, encoder, count):
+        words = []
+        for _ in range(count):
+            index = encoder.get_index('.')
+            chars = []
+            while True:
+                index = model(index)
+                if index == 0:
+                    break
+                chars.append(encoder.get_char(index))
+            words.append(''.join(chars))
+        return words
 
-    for word in generate_words(model, encoder, 5, generator):
-        print(word)
+    def calculate_loss(model, words):
+        log_sum = 0.0
+        count = 0
+        for word in words:
+            for pair in word.get_pairs():
+                log_sum += model.get_log_likelihood(pair)
+                count += 1
+        return log_sum / count
+
+    def show_stats(model, words):
+        for word in words:
+            for pair in word.get_pairs():
+                count = model.get_count(pair)
+                prob = model.get_probability(pair)
+                likelihood = model.get_log_likelihood(pair)
+                print(f'{pair}: {count=:>8}, {prob=:.4f}, {likelihood=:.4f}')
+
     print('---')
     show_stats(model, words[:3])
     print('---')
-    print(f'{calculate_loss(model, words[:3])=:.4f}')
+    print(f'{calculate_loss(model, words[:])=:.4f}')
+    print('---')
+    for word in generate_words(model, encoder, 20):
+        print(word)
     print('---')
 
 
 def run_neuron_bigram(args):
     from lib import WordList, Encoder, NeuronBigram
-    from lib import init_random
+    from lib import init_random, global_generator
     import torch
 
     init_random(2147483647)
@@ -49,31 +80,34 @@ def run_neuron_bigram(args):
         loss = -probs.log().mean()
         return loss
 
-    def generate_words(model, encoder, count):
+    def generate_words(model, encoder, count, generator=None):
+        if generator is None:
+            generator = global_generator
+
         for index in range(count):
             chars = []
             index = encoder.get_index('.')
             while True:
                 probs = model(encoder.get_embedding(index))
-                index = torch.multinomial(probs, 1).item()
+                index = torch.multinomial(probs, 1, generator=generator).item()
                 if index == 0:
                     break
                 chars.append(encoder.get_char(index))
             print(''.join(chars))
 
     inputs, labels = prepare_data(words.count)
-    predictions = model(inputs)
-    loss = calculate_loss(labels, predictions)
 
     for iteration in range(500):
         predictions = model(inputs)
         loss = calculate_loss(labels, predictions)
-        print(f'[{iteration:>4}] {loss=:.8f}')
+        # print(f'[{iteration:>4}] {loss=:.8f}')
 
         model.reset_grad()
         loss.backward()
         model.descend(50)
 
+    print(f'{loss=:.8f}')
+    print('---')
     generate_words(model, encoder, 20)
 
 
