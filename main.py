@@ -67,6 +67,8 @@ def run_neuron_bigram(args):
     for _ in range(5):
         print(simple_model.generate_word(encoder))
 
+def run_sandbox(args):
+    pass
 
 if __name__ == '__main__':
     import sys
@@ -79,6 +81,7 @@ if __name__ == '__main__':
                         '%(message)s')
 
     command_map = {
+        'sandbox': (run_sandbox, 'Runs sandbox code used to evaluate ideas'),
         'simple': (run_simple_bigram, 'Evaluates the simple bigram model'),
         'neuron': (run_neuron_bigram, 'Evaluates the neuron bigram model'),
     }
