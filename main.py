@@ -45,6 +45,7 @@ def run_neuron_bigram(args):
         [encoder.get_embedding(char) for char in chars])
     inputs, labels = prepare_data(words[:], transform)
 
+    loss = None
     for iteration in range(50):
         predictions, loss = neuron_model(inputs, labels=labels)
         print(f'[{iteration:>4}] {loss=:.8f}')
@@ -54,7 +55,7 @@ def run_neuron_bigram(args):
         neuron_model.descend(50)
 
     print('=== Neuron model ===')
-    print(f'loss={loss.item()}')
+    print(f'loss={loss.item() if loss is not None else "None"}')
     print('--- Words ---')
     init_random(2147483647)
     for _ in range(5):

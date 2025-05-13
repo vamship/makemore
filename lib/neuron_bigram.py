@@ -17,6 +17,7 @@ class NeuronBigram:
         if generator is None:
             generator = global_generator
 
+        # logits = self._weights[torch.argmax(inputs, len(inputs.shape) - 1)]
         logits = inputs @ self._weights
         sum_index = len(logits.shape) - 1
         counts = torch.exp(logits)
