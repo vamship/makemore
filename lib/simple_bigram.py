@@ -1,6 +1,6 @@
 import torch
 from .word_list import WordList
-from .encoder import Encoder
+from .bigram_encoder import BigramEncoder
 from .utils import global_generator
 
 
@@ -8,7 +8,7 @@ class SimpleBigram:
 
     def __init__(self, word_list, encoder):
         assert isinstance(word_list, WordList), "Invalid word_list (arg #1)"
-        assert isinstance(encoder, Encoder), "Invalid encoder (arg #2)"
+        assert isinstance(encoder, BigramEncoder), "Invalid encoder (arg #2)"
 
         self._bigram_counts = torch.zeros(
             (word_list.vocabulary_size, word_list.vocabulary_size),

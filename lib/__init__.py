@@ -1,6 +1,6 @@
 __all__ = [
     'Word',
-    'Encoder',
+    'BigramEncoder',
     'WordList',
     'SimpleBigram',
     'NeuronBigram',
@@ -10,7 +10,7 @@ __all__ = [
 ]
 
 from .word import Word
-from .encoder import Encoder
+from .bigram_encoder import BigramEncoder
 from .word_list import WordList
 from .simple_bigram import SimpleBigram
 from .neuron_bigram import NeuronBigram
