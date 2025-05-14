@@ -12,11 +12,11 @@ def init_random(seed=1337):
     random.seed(seed)
 
 
-def prepare_data(words, transform):
+def prepare_data(words, transform, input_count=1):
     input_chars = []
     label_chars = []
     for word in words:
-        for pair in word.get_pairs():
+        for pair in word.get_pairs(input_count):
             input_chars.append(pair[0])
             label_chars.append(pair[1])
 

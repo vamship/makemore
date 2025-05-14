@@ -16,18 +16,28 @@ class Encoder:
         return f'Encoder({len(self._char_lookup)})'
 
     def get_index(self, char):
-        assert isinstance(char, str), 'Invalid character (arg #1)'
-        return self._char_map.get(char, None)
+        if isinstance(char, str):
+            return self._char_map.get(char, None)
+        elif isinstance(char, tuple):
+            return self.get_index(char[0])  # Assumes a bigram
+        elif isinstance(char, list):
+            return [self.get_index(ch) for ch in char]
+        assert False, 'Invalid char (arg #1)'
 
     def get_char(self, index):
         assert index >= 0, 'Invalid index (arg #1)'
         return self._char_lookup[index]
 
     def get_embedding(self, index):
+        if isinstance(index, (int, float)):
+            return self._embeddings[index]
         if isinstance(index, str):
-            index = self.get_index(index)
+            return self.get_embedding(self.get_index(index))
+        elif isinstance(index, tuple):
+            return self.get_embedding(index[0])  # Assumes a bigram
+        elif isinstance(index, list):
+            return [self.get_embedding(i) for i in index]
         assert index >= 0, 'Invalid index (arg #1)'
-        return self._embeddings[index]
 
     def get_char_from_embedding(self, embedding):
         assert isinstance(embedding,

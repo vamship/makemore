@@ -67,8 +67,45 @@ def run_neuron_bigram(args):
     for _ in range(5):
         print(simple_model.generate_word(encoder))
 
+
 def run_sandbox(args):
-    pass
+    from lib import WordList, Encoder, SimpleBigram, NeuronBigram
+    from lib import init_random, prepare_data
+    import torch
+
+    init_random(2147483647)
+
+    words = WordList('data/names.txt')
+    encoder = Encoder(words.vocabulary)
+    neuron_model = NeuronBigram(words.vocabulary_size)
+    simple_model = SimpleBigram(words, encoder)
+
+    transform = lambda chars: torch.stack(
+        [encoder.get_embedding(char) for char in chars])
+    inputs, labels = prepare_data(words[:], transform)
+
+    loss = None
+    for iteration in range(500):
+        predictions, loss = neuron_model(inputs, labels=labels)
+        print(f'[{iteration:>4}] {loss=:.8f}')
+
+        neuron_model.reset_grad()
+        loss.backward()
+        neuron_model.descend(50)
+
+    print('=== Neuron model ===')
+    print(f'loss={loss.item() if loss is not None else "None"}')
+    print('--- Words ---')
+    init_random(2147483647)
+    for _ in range(5):
+        print(neuron_model.generate_word(encoder))
+
+    print('=== Simple model ===')
+    print('--- Words ---')
+    init_random(2147483647)
+    for _ in range(5):
+        print(simple_model.generate_word(encoder))
+
 
 if __name__ == '__main__':
     import sys

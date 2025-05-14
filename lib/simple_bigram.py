@@ -18,7 +18,7 @@ class SimpleBigram:
             dtype=torch.float)
 
         for word in word_list:
-            for pair in word.get_pairs():
+            for pair in word.get_pairs(1):
                 row, col = self._get_pair_indices(pair, encoder)
                 self._bigram_counts[row, col] += 1
 
@@ -26,7 +26,8 @@ class SimpleBigram:
         self._bigram_probs = self._bigram_counts / sums
 
     def _get_pair_indices(self, pair, encoder):
-        row, col, *_ = [encoder.get_index(char) for char in pair]
+        row = encoder.get_index(pair[0][0])
+        col = encoder.get_index(pair[1])
         return row, col
 
     def _show_data(data, encoder):
@@ -48,18 +49,20 @@ class SimpleBigram:
             generator = global_generator
 
         if isinstance(inputs, (int, float)):
-            inputs = torch.tensor([inputs], dtype=torch.float)
+            inputs = torch.tensor([[inputs]], dtype=torch.float)
         elif isinstance(inputs, list):
-            inputs = torch.tensor(inputs, dtype=torch.float)
+            inputs = torch.tensor([inputs], dtype=torch.float)
         assert isinstance(inputs, torch.Tensor), 'Invalid inputs (arg #1)'
 
-        predictions = torch.multinomial(self._bigram_probs[inputs.int()],
+        # Use -1 because we're expecting a single input
+        indices = inputs[:, -1].int()
+        predictions = torch.multinomial(self._bigram_probs[indices],
                                         1,
                                         replacement=True,
                                         generator=generator)
         loss = None
         if labels is not None:
-            loss = -torch.log(self._bigram_probs[inputs, labels]).mean()
+            loss = -torch.log(self._bigram_probs[indices, labels]).mean()
 
         return predictions, loss
 
