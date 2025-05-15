@@ -40,9 +40,12 @@ class Word:
         :param index: The index or slice to be retrieved from the text. Raw
         indicies must be non-negative.
         """
-        if not isinstance(index, slice):
+        if isinstance(index, slice):
+            start, stop, step = index.start, index.stop, index.step
+            return self._text[start:stop:step]
+        else:
             assert index >= 0, 'Invalid index (arg #1)'
-        return self._text[index]
+            return self._text[index]
 
     def get_pairs(self, input_count: int = 1) -> PairList:
         """ Splits the words into pairs comprising inputs and labels.

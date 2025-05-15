@@ -78,6 +78,7 @@ class NeuronBigram:
 
         :return: The generated word as a string.
         """
+
         assert isinstance(encoder, BigramEncoder), "Invalid encoder (arg #1)"
 
         if generator is None:
@@ -101,6 +102,7 @@ class NeuronBigram:
         This is necessary to avoid accumulating gradients from multiple gradient
         calculations.
         """
+
         self._weights.grad = None
 
     def update(self, delta: float):
@@ -109,4 +111,5 @@ class NeuronBigram:
 
         :param delta: The step size to use for the update.
         """
+
         self._weights.data += -delta * self._weights.grad
