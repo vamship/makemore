@@ -1,7 +1,7 @@
 import torch
 from .word_list import WordList
 from .bigram_encoder import BigramEncoder
-from .utils import global_generator
+from .utils import global_generator, prepare_data
 
 type BigramPair = tuple[tuple[str], str]
 
@@ -56,6 +56,10 @@ class SimpleBigram:
                 probs.append(data[row_index, col_index].item())
             print(' '.join(labels))
             print(' '.join([f'{prob:^8.4f}' for prob in probs]))
+
+    def __repr__(self) -> str:
+        """ Representation of the model. """
+        return f'SimpleBigram({self._bigram_counts.shape})'
 
     def __call__(
         self,
@@ -171,3 +175,16 @@ class SimpleBigram:
         """
 
         SimpleBigram._show_data(self._bigram_probs, encoder)
+
+    def prepare_data(self, words: WordList, encoder) -> tuple[torch.Tensor, torch.Tensor]:
+        """ Prepares data that can be used to train this model.
+
+        :param words: A WordList object containing the words to be used to
+        generate the dataset.
+        :param encoder: The encoder used to convert characters to indices.
+        :return: A tuple containing the input and label tensors.
+        """
+
+        transform = lambda chars: torch.tensor(
+            [encoder.get_index(char) for char in chars])
+        return prepare_data(words[:], transform)

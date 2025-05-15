@@ -1,6 +1,7 @@
 import torch
-from .utils import global_generator
+from .utils import global_generator, prepare_data
 from .bigram_encoder import BigramEncoder
+from .word_list import WordList
 
 
 class NeuronBigram:
@@ -31,6 +32,10 @@ class NeuronBigram:
                                     dtype=torch.float,
                                     requires_grad=True,
                                     generator=generator)
+
+    def __repr__(self) -> str:
+        """ Representation of the model. """
+        return f'NeuronBigram({self._weights.shape})'
 
     def __call__(
         self,
@@ -113,3 +118,17 @@ class NeuronBigram:
         """
 
         self._weights.data += -delta * self._weights.grad
+
+    def prepare_data(self, words: WordList,
+                     encoder) -> tuple[torch.Tensor, torch.Tensor]:
+        """ Prepares data that can be used to train this model.
+
+        :param words: A WordList object containing the words to be used to
+        generate the dataset.
+        :param encoder: The encoder used to convert characters to embeddings.
+        :return: A tuple containing the input and label tensors.
+        """
+
+        transform = lambda chars: torch.stack(
+            [encoder.get_embedding(char) for char in chars])
+        return prepare_data(words[:], transform)
