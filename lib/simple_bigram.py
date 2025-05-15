@@ -81,13 +81,10 @@ class SimpleBigram:
             generator = global_generator
 
         if isinstance(inputs, (int, float)):
-            inputs = torch.tensor([[inputs]], dtype=torch.float)
-        elif isinstance(inputs, list):
             inputs = torch.tensor([inputs], dtype=torch.float)
         assert isinstance(inputs, torch.Tensor), 'Invalid inputs (arg #1)'
 
-        # Use -1 because we're expecting a single input
-        indices = inputs[:, -1].int()
+        indices = inputs.int()
         predictions = torch.multinomial(self._bigram_probs[indices],
                                         1,
                                         replacement=True,
