@@ -92,7 +92,8 @@ class NeuronBigram:
         chars = []
         index = encoder.get_index('.')
         while True:
-            probs, _ = self(encoder.get_embedding(index))
+            embedding_input = tuple(encoder.get_char(index))
+            probs, _ = self(encoder.get_embedding(embedding_input))
             index = torch.multinomial(probs,
                                       1,
                                       replacement=True,

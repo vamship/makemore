@@ -40,7 +40,7 @@ class SimpleBigram:
 
     def _get_pair_indices(self, pair, encoder):
         row = encoder.get_index(pair[0][0])
-        col = encoder.get_index(pair[1])
+        col = encoder.get_index(pair[1][0])
         return row, col
 
     def _show_data(data, encoder):
@@ -186,5 +186,5 @@ class SimpleBigram:
         """
 
         transform = lambda chars: torch.tensor(
-            [encoder.get_index(char) for char in chars])
+            [encoder.get_index(char[0]) for char in chars])
         return prepare_data(words[:], transform)
