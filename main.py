@@ -17,9 +17,9 @@ def run_simple_bigram(args, words=None, encoder=None):
     predictions, loss = simple_model(inputs, labels)
 
     print('=== Simple model ===')
-    print(loss.item())
-
     print(f'loss={loss.item() if loss is not None else "None"}')
+
+    return simple_model
 
 
 def run_neuron_bigram(args, words=None, encoder=None):
