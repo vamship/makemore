@@ -1,4 +1,4 @@
-def run_simple_bigram(args, words = None, encoder = None):
+def run_simple_bigram(args, words=None, encoder=None):
     from lib import WordList, BigramEncoder, SimpleBigram
     from lib import init_random
     import torch
@@ -19,10 +19,10 @@ def run_simple_bigram(args, words = None, encoder = None):
     print('=== Simple model ===')
     print(loss.item())
 
-    return simple_model
+    print(f'loss={loss.item() if loss is not None else "None"}')
 
 
-def run_neuron_bigram(args, words = None, encoder = None):
+def run_neuron_bigram(args, words=None, encoder=None):
     from lib import WordList, BigramEncoder, NeuronBigram, SimpleBigram
     from lib import init_random
     import torch
