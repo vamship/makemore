@@ -52,7 +52,7 @@ def run_neuron_bigram(args, words=None, encoder=None):
     return neuron_model
 
 
-def run_sandbox(args):
+def run_all_bigrams(args):
     from lib import init_random, WordList, BigramEncoder
 
     words = WordList('data/names.txt')
@@ -60,6 +60,7 @@ def run_sandbox(args):
     neuron_model = run_neuron_bigram(args, words, encoder)
     simple_model = run_simple_bigram(args, words, encoder)
 
+    print('')
     for model in [simple_model, neuron_model]:
         init_random(2147483647)
         print(f'--- Words {model}---')
@@ -78,9 +79,12 @@ if __name__ == '__main__':
                         '%(message)s')
 
     command_map = {
-        'sandbox': (run_sandbox, 'Runs sandbox code used to evaluate ideas'),
-        'simple': (run_simple_bigram, 'Evaluates the simple bigram model'),
-        'neuron': (run_neuron_bigram, 'Evaluates the neuron bigram model'),
+        'all-bigrams':
+        (run_all_bigrams, 'Runs both bigram models side by side'),
+        'simple-bigram':
+        (run_simple_bigram, 'Evaluates the simple bigram model'),
+        'neuron-bigram':
+        (run_neuron_bigram, 'Evaluates the neuron bigram model'),
     }
     args = sys.argv
     command_name = args[1] if len(args) > 1 else ''
